@@ -1,0 +1,24 @@
+<!DOCTYPE html SYSTEM "about:legacy-compat">
+
+<html xmlns:z="http://www.hekkelman.com/libzeep/m2"
+	  lang="en">
+
+<nav z:fragment="menu(page)" class="navbar navbar-expand-lg bg-dark navbar-dark">
+	<a href="/" z:href="@{/}" class="navbar-brand">libzeep web app</a>
+
+	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	</button>
+
+	<ul class="navbar-nav collapse navbar-collapse" id="navbarToggler">
+		<li class="nav-item">
+			<a class="nav-link" href="/" z:href="@{/}" z:classappend="${page == 'home' ? 'active'}">Home</a>
+		</li>
+
+		<li class="nav-item">
+			<a class="nav-link" href="/foo" z:href="@{/foo}" z:classappend="${page == 'foo' ? 'active'}">Foo</a>
+		</li>
+	</ul>
+</nav>
+
+</html>

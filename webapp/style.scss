@@ -1,0 +1,43 @@
+// @use "sass:math";
+
+@import "bootstrap/scss/bootstrap";
+@import "bootstrap-icons/font/bootstrap-icons.css";
+
+// Add your own style here
+
+.site {
+	display: flex;
+	min-height: 100vh;
+	height: 100%;
+	flex-direction: column;
+
+	header,
+	footer {
+		flex: none;
+	}
+
+	footer {
+		border-top: 1px solid #888;
+		padding: 0.5em;
+		margin-top: 2em;
+		font-size: small;
+		color: #555;
+		white-space: pre;
+	}
+
+	.site-content {
+		flex: 1 0 auto;
+		padding: var(--space) var(--space) 0;
+		width: 100%;
+
+		&::after {
+			content: '\00a0';
+			/* &nbsp; */
+			display: block;
+			margin-top: var(--space);
+			height: 0px;
+			visibility: hidden;
+		}
+	}
+}
+
