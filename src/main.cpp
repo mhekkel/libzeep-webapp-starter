@@ -24,10 +24,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#if __has_include("mrsrc.hpp") and NDEBUG
 #define WEBAPP_USES_RESOURCES 1
-
-#if __has_include("mrsrc.hpp")
-#include "mrsrc.hpp"
+#else
+#define WEBAPP_USES_RESOURCES 0
 #endif
 
 #include "revision.hpp"
@@ -137,10 +137,10 @@ Command should be either:
 		{
 			auto s = new zeep::http::server("docroot");
 
-#ifndef NDEBUG
-			s->set_template_processor(new zeep::http::file_based_html_template_processor("docroot"));
-#else
+#if WEBAPP_USES_RESOURCES
 			s->set_template_processor(new zeep::http::rsrc_based_html_template_processor());
+#else
+			s->set_template_processor(new zeep::http::file_based_html_template_processor("docroot"));
 #endif
 
 			s->add_controller(new start_controller());
