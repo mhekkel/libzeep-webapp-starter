@@ -60,11 +60,22 @@ class start_controller : public zeep::http::html_controller
 		map_get("", "index");
 		map_get("index.html", "index");
 		map_get("home", "index");
-		map_get("foo", "foo");
+		map_get("hello", "hello");
+		map_post("hello", &start_controller::post_hello, "name");
 		
 		mount("{css,scripts,fonts}/", &start_controller::handle_file);
 	}
+
+	zeep::http::reply post_hello(const zeep::http::scope &scope, std::optional<std::string> name);
 };
+
+zeep::http::reply start_controller::post_hello(const zeep::http::scope &scope, std::optional<std::string> name)
+{
+	zeep::http::scope sub(scope);
+	if (name.has_value())
+		sub.put("user", *name);
+	return get_template_processor().create_reply_from_template("hello", sub);
+}
 
 // --------------------------------------------------------------------
 
@@ -79,7 +90,7 @@ int main(int argc, const char *argv[])
 		mcfp::make_option("verbose,v", "Verbose output"),
 		mcfp::make_option("version", "Show version information"),
 
-		mcfp::make_option<std::string>("address", "0.0.0.0", "External address"),
+		mcfp::make_option<std::string>("address", "localhost", "External address"),
 		mcfp::make_option<uint16_t>("port", 10336, "Port to listen to"),
 		mcfp::make_option("no-daemon,F", "Do not fork into background"),
 		mcfp::make_option<std::string>("user,u", "www-data", "User to run the daemon"));

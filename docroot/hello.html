@@ -1,0 +1,36 @@
+<!DOCTYPE html SYSTEM "about:legacy-compat">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:z2="http://www.hekkelman.com/libzeep/m2" lang="nl">
+
+<!-- Include the default head, passing as parameters the title and scripts defined in this block -->
+
+<head z2:replace="~{head::head(~{::title},~{::head/script})}">
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+	<title>My first libzeep web application - Home page</title>
+</head>
+
+<body class="site">
+	<nav z2:replace="~{menu::menu('hello')}"></nav>
+
+	<div class="container site-content">
+		<h1 class="mt-5">This is page <em>Form</em>.</h1>
+
+		<p class="mt-3"><span z2:if="${user}" z2:text="|Hello ${user}! |"></span>This is a page with a simple form.</p>
+
+		<form method="post">
+			<div class="mb-3">
+				<label for="inputName" class="form-label">Your name</label>
+				<input type="text" name="name" z2:value="${user}" class="form-control" id="inputName"
+					aria-describedby="nameHelp" />
+				<div id="nameHelp" class="form-text">Put your name here and press submit.</div>
+			</div>
+			<button type="submit" class="btn btn-primary">Submit</button>
+		</form>
+	</div>
+
+	<footer z2:replace="~{footer::content}"></footer>
+</body>
+
+</html>
