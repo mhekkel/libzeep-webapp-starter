@@ -6,7 +6,6 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const path = require('path');
 
 const SCRIPTS = __dirname + "/webapp/";
-const SCSS = __dirname + "/scss/";
 const DEST = __dirname + "/docroot/";
 
 module.exports = (env) => {
@@ -19,11 +18,9 @@ module.exports = (env) => {
 		},
 
 		output: {
-			path: DEST + "/scripts/",
-			filename: "./[name].js"
+			path: DEST,
+			filename: "scripts/[name].js"
 		},
-
-		devtool: "source-map",
 
 		module: {
 			rules: [
@@ -37,21 +34,23 @@ module.exports = (env) => {
 						}
 					}
 				},
+
 				{
-					test: /style\.scss$/,
+					test: /\.(sa|sc|c)ss$/i,
 					use: [
-						// PRODUCTION ? MiniCssExtractPlugin.loader : "style-loader",
-						"style-loader",
-						'css-loader',
-						'sass-loader'
+						MiniCssExtractPlugin.loader,
+						"css-loader",
+						"postcss-loader",
+						"sass-loader"
 					]
 				},
+
 				{
 					test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
 					include: path.resolve(__dirname, './node_modules/bootstrap-icons/font/fonts'),
 					type: 'asset/resource',
 					generator: {
-						filename: 'fonts/[name][ext][query]'
+						filename: 'fonts/[name][ext]'
 					}
 				},
 
@@ -71,22 +70,16 @@ module.exports = (env) => {
 		},
 
 		resolve: {
-			extensions: ['.tsx', '.ts', '.js'],
+			extensions: ['.js', '.scss'],
 		},
 
 		plugins: [
 			new MiniCssExtractPlugin({
-				filename: './css/[name].css',
-				chunkFilename: './css/[id].css'
+				filename: "css/[name].css"
 			})
 		],
 
-		optimization: {
-			minimizer: [
-				new TerserPlugin({ /* additional options here */ }),
-				new UglifyJsPlugin({ parallel: 4 })
-			]
-		}
+		optimization: { minimizer: [] }
 	};
 
 	if (PRODUCTION) {
@@ -96,9 +89,15 @@ module.exports = (env) => {
 			new CleanWebpackPlugin({
 				cleanOnceBeforeBuildPatterns: [
 					'scripts/**/*',
-					'fonts/**/*'
+					'fonts/**/*',
+					'css/**'
 				]
 			}));
+
+		webpackConf.optimization.minimizer.push(
+			new TerserPlugin({ /* additional options here */ }),
+			new UglifyJsPlugin({ parallel: 4 })
+		);
 	} else {
 		webpackConf.mode = "development";
 		webpackConf.devtool = 'source-map';

@@ -11,9 +11,6 @@
 		"build-production": "webpack --config webpack.config.js --env PRODUCTION"
 	},
 	"devDependencies": {
-		"webpack": "^5.75.0"
-	},
-	"dependencies": {
 		"@babel/core": "^7.20.12",
 		"@babel/preset-env": "^7.20.2",
 		"@popperjs/core": "^2.11.6",
@@ -21,15 +18,17 @@
 		"bootstrap": "^5.2.3",
 		"bootstrap-icons": "^1.10.3",
 		"clean-webpack-plugin": "^4.0.0",
-		"core-js": "^3.27.2",
+		"core-js": "^3.28.0",
 		"css-loader": "^6.7.3",
 		"file-loader": "^6.2.0",
 		"mini-css-extract-plugin": "^2.7.2",
-		"sass": "^1.58.0",
+		"postcss-loader": "^7.0.2",
+		"sass": "^1.58.1",
 		"sass-loader": "^13.2.0",
 		"style-loader": "^3.3.1",
 		"terser-webpack-plugin": "^5.3.6",
 		"uglifyjs-webpack-plugin": "^2.2.0",
+		"webpack": "^5.75.0",
 		"webpack-cli": "^5.0.1"
 	}
 }
