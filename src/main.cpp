@@ -42,7 +42,7 @@
 #include <zeep/http/rest-controller.hpp>
 #include <zeep/json/parser.hpp>
 
-#include <mcfp.hpp>
+#include <mcfp/mcfp.hpp>
 
 #include <functional>
 #include <iostream>

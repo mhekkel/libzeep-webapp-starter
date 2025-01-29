@@ -54,10 +54,10 @@ endif()
 
 # Libraries
 find_package(zeep 6 REQUIRED)
-find_package(libmcfp REQUIRED)
+find_package(mcfp REQUIRED)
 
 add_executable(libzeep-webapp-starter ${PROJECT_SOURCE_DIR}/src/main.cpp)
-target_link_libraries(libzeep-webapp-starter libmcfp::libmcfp zeep::zeep)
+target_link_libraries(libzeep-webapp-starter mcfp::mcfp zeep::zeep)
 
 # yarn rules for javascripts
 
