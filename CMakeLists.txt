@@ -47,13 +47,13 @@ write_version_header(${PROJECT_SOURCE_DIR}/src)
 find_package(Mrc QUIET)
 
 if(NOT MRC_FOUND)
-	message(WARNING "Cannot use resources since mrc was not found")
+	message(WARNING "zeep-webapp-starter: Cannot use resources since mrc was not found")
 else()
 	mrc_write_header(${PROJECT_SOURCE_DIR}/src/mrsrc.hpp)
 endif()
 
 # Libraries
-find_package(zeep 6 REQUIRED)
+find_package(zeep 7.1 REQUIRED)
 find_package(mcfp REQUIRED)
 
 add_executable(libzeep-webapp-starter ${PROJECT_SOURCE_DIR}/src/main.cpp)

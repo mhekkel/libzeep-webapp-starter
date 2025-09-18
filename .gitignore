@@ -5,4 +5,4 @@ docroot/fonts
 docroot/css
 src/revision.hpp
 src/mrsrc.hpp
-.gitignore
+.cache/
