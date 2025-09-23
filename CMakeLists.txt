@@ -44,7 +44,7 @@ include(VersionString)
 write_version_header(${PROJECT_SOURCE_DIR}/src)
 
 # use mrc to create resources
-find_package(Mrc QUIET)
+find_package(mrc QUIET)
 
 if(NOT MRC_FOUND)
 	message(WARNING "zeep-webapp-starter: Cannot use resources since mrc was not found")

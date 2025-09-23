@@ -1,8 +1,5 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const webpack = require('webpack');
-const TerserPlugin = require('terser-webpack-plugin');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const path = require('path');
 
 const SCRIPTS = __dirname + "/webapp/";
@@ -14,7 +11,8 @@ module.exports = (env) => {
 
 	const webpackConf = {
 		entry: {
-			index: SCRIPTS + "index.js"
+			index: SCRIPTS + "index.js",
+			style: SCRIPTS + "style.scss"
 		},
 
 		output: {
@@ -93,15 +91,9 @@ module.exports = (env) => {
 					'css/**'
 				]
 			}));
-
-		webpackConf.optimization.minimizer.push(
-			new TerserPlugin({ /* additional options here */ }),
-			new UglifyJsPlugin({ parallel: 4 })
-		);
 	} else {
 		webpackConf.mode = "development";
 		webpackConf.devtool = 'source-map';
-		webpackConf.plugins.push(new webpack.optimize.AggressiveMergingPlugin())
 	}
 
 	return webpackConf;

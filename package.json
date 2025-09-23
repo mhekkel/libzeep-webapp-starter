@@ -15,7 +15,7 @@
 		"@babel/preset-env": "^7.20.2",
 		"@popperjs/core": "^2.11.6",
 		"babel-loader": "^10.0.0",
-		"bootstrap": "^5.2.3",
+		"bootstrap": "^5.3.8",
 		"bootstrap-icons": "^1.10.3",
 		"clean-webpack-plugin": "^4.0.0",
 		"core-js": "^3.28.0",
@@ -26,8 +26,6 @@
 		"sass": "^1.58.1",
 		"sass-loader": "^16.0.5",
 		"style-loader": "^4.0.0",
-		"terser-webpack-plugin": "^5.3.6",
-		"uglifyjs-webpack-plugin": "^2.2.0",
 		"webpack": "^5.75.0",
 		"webpack-cli": "^6.0.1"
 	}
