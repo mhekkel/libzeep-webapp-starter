@@ -1,9 +1,12 @@
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const glob = require('glob-all');
+const { PurgeCSSPlugin } = require("purgecss-webpack-plugin");
+var TerserPlugin = require("terser-webpack-plugin");
 
-const SCRIPTS = __dirname + "/webapp/";
-const DEST = __dirname + "/docroot/";
+const SCRIPTS = path.resolve(__dirname, "webapp");
+const DEST = path.resolve(__dirname, "docroot");
 
 module.exports = (env) => {
 
@@ -11,12 +14,13 @@ module.exports = (env) => {
 
 	const webpackConf = {
 		entry: {
-			index: SCRIPTS + "index.js",
-			style: SCRIPTS + "style.scss"
+			index: path.resolve(SCRIPTS, "index.js"),
+			style: path.resolve(SCRIPTS, "style.scss")
 		},
 
 		output: {
 			path: DEST,
+			crossOriginLoading: 'anonymous',
 			filename: "scripts/[name].js"
 		},
 
@@ -38,7 +42,6 @@ module.exports = (env) => {
 					use: [
 						MiniCssExtractPlugin.loader,
 						"css-loader",
-						"postcss-loader",
 						"sass-loader"
 					]
 				},
@@ -68,16 +71,16 @@ module.exports = (env) => {
 		},
 
 		resolve: {
-			extensions: ['.js', '.scss'],
+			extensions: ['.js', '.css', '.scss'],
 		},
+
+		target: 'web',
 
 		plugins: [
 			new MiniCssExtractPlugin({
 				filename: "css/[name].css"
 			})
-		],
-
-		optimization: { minimizer: [] }
+		]
 	};
 
 	if (PRODUCTION) {
@@ -85,12 +88,27 @@ module.exports = (env) => {
 
 		webpackConf.plugins.push(
 			new CleanWebpackPlugin({
+				verbose: true,
 				cleanOnceBeforeBuildPatterns: [
-					'scripts/**/*',
-					'fonts/**/*',
-					'css/**'
+					'css/*',
+					'fonts/*',
+					'scripts/*',
 				]
-			}));
+				
+			}),
+			new PurgeCSSPlugin({
+				paths: glob.sync([
+					`${SCRIPTS}/**/*`,
+					`${DEST}/**/*`
+				], { nodir: true })
+			})
+		);
+
+		webpackConf.optimization = {
+			minimize: true,
+			minimizer: [new TerserPlugin()]
+		};
+
 	} else {
 		webpackConf.mode = "development";
 		webpackConf.devtool = 'source-map';

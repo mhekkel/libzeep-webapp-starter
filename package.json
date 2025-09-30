@@ -21,11 +21,13 @@
 		"core-js": "^3.28.0",
 		"css-loader": "^7.1.2",
 		"file-loader": "^6.2.0",
+		"glob-all": "^3.3.1",
 		"mini-css-extract-plugin": "^2.7.2",
-		"postcss-loader": "^8.2.0",
+		"purgecss-webpack-plugin": "^7.0.2",
 		"sass": "^1.58.1",
 		"sass-loader": "^16.0.5",
 		"style-loader": "^4.0.0",
+		"terser-webpack-plugin": "^5.3.14",
 		"webpack": "^5.75.0",
 		"webpack-cli": "^6.0.1"
 	}
