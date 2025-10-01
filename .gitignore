@@ -6,3 +6,5 @@ docroot/css
 src/revision.hpp
 src/mrsrc.hpp
 .cache/
+webapp/fonts.css
+webapp/fonts/

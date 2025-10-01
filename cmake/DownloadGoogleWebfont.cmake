@@ -40,9 +40,12 @@ function(download_google_webfont)
 
     cmake_path(GET GWF_OPTION_CSS_FILE PARENT_PATH _css_file_dir)
 
-    file(WRITE ${GWF_OPTION_CSS_FILE} "")
+    set(_temp_file ${CMAKE_CURRENT_BINARY_DIR}/gwf.file.1)
+    set(_temp_css_file ${CMAKE_CURRENT_BINARY_DIR}/gwf.file.2)
 
-    set(_temp_file ${CMAKE_CURRENT_BINARY_DIR}/gwf.file)
+    file(WRITE ${_temp_css_file} "")
+    set(_file_empty ON)
+
     foreach(_font IN LISTS GWF_OPTION_FONTS)
         string(REPLACE " " "+" _font_name ${_font})
         set(_url "https://fonts.googleapis.com/css?family=${_font_name}")
@@ -70,6 +73,13 @@ function(download_google_webfont)
             string(REPLACE "${_font_file_url}" "${_font_file_relative_path}" _font_file_text "${_font_file_text}")
         endforeach()
 
-        file(APPEND ${GWF_OPTION_CSS_FILE} "${_font_file_text}")
+        file(APPEND ${_temp_css_file} "${_font_file_text}")
+        set(_file_empty OFF)
     endforeach()
+
+    if(NOT _file_empty)
+        file(COPY_FILE ${_temp_css_file} ${GWF_OPTION_CSS_FILE} ONLY_IF_DIFFERENT)
+    endif()
+
+    file(REMOVE ${_temp_css_file})
 endfunction(download_google_webfont)

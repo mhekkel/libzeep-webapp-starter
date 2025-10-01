@@ -87,13 +87,14 @@ add_custom_command(
 
 list(APPEND webpack_input
 	${CMAKE_CURRENT_SOURCE_DIR}/webapp/index.js
+	${CMAKE_CURRENT_SOURCE_DIR}/webapp/fonts.css
 	${CMAKE_CURRENT_SOURCE_DIR}/webapp/style.scss
 	${CMAKE_CURRENT_SOURCE_DIR}/webpack.config.js
 )
 
 download_google_webfont(
 	CSS_FILE ${CMAKE_CURRENT_SOURCE_DIR}/webapp/fonts.css
-	"Raleway:ital,wght@0,100..900|1,100..900")
+	FONTS "Raleway:ital,wght@0,100..900|1,100..900")
 
 set(webpack_output
 	${CMAKE_CURRENT_SOURCE_DIR}/docroot/scripts/index.js)
