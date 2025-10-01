@@ -65,7 +65,7 @@ function(download_google_webfont)
             cmake_path(GET _font_file_path RELATIVE_PART _font_file_path_relative)
 
             if(NOT EXISTS ${_font_file_path})
-                message(STATUS "downloading ${_font_file_path}")
+                message(STATUS "downloading ${_font_file_url}")
                 file(DOWNLOAD ${_font_file_url} "${_font_file_path}" STATUS _stat)
                 check_download_status(${_stat})
             endif()
