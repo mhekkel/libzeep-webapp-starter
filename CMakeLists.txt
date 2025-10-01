@@ -29,6 +29,10 @@ project(libzeep-webapp-starter VERSION 1.0.2 LANGUAGES CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+include(CPM)
+include(DownloadGoogleWebfont)
+include(GNUInstallDirs)
+
 set(CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -53,8 +57,20 @@ else()
 endif()
 
 # Libraries
-find_package(zeep 7.1 REQUIRED)
-find_package(mcfp REQUIRED)
+
+CPMFindPackage(NAME zeep
+	GIT_REPOSITORY "https://forge.hekkelman.net/maarten/zeep.git"
+	GIT_TAG v7.1.0
+	EXCLUDE_FROM_ALL YES)
+
+CPMFindPackage(
+	NAME mcfp
+	GIT_REPOSITORY https://forge.hekkelman.net/maarten/mcfp.git
+	GIT_TAG v1.4.2
+	VERSION 1.4.2
+	EXCLUDE_FROM_ALL YES
+	OPTIONS
+	"BUILD_TESTING NO")
 
 add_executable(libzeep-webapp-starter ${PROJECT_SOURCE_DIR}/src/main.cpp)
 target_link_libraries(libzeep-webapp-starter mcfp::mcfp zeep::zeep)
@@ -63,26 +79,46 @@ target_link_libraries(libzeep-webapp-starter mcfp::mcfp zeep::zeep)
 
 find_program(YARN yarn REQUIRED)
 
-set(webpack_input
+# Make sure yarn is initialised
+add_custom_command(
+	OUTPUT ${PROJECT_SOURCE_DIR}/node_modules
+	COMMAND ${YARN}
+	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+
+list(APPEND webpack_input
 	${CMAKE_CURRENT_SOURCE_DIR}/webapp/index.js
 	${CMAKE_CURRENT_SOURCE_DIR}/webapp/style.scss
 	${CMAKE_CURRENT_SOURCE_DIR}/webpack.config.js
 )
 
-set(webpack_output ${CMAKE_CURRENT_SOURCE_DIR}/docroot/scripts/index.js)
+download_google_webfont(
+	CSS_FILE ${CMAKE_CURRENT_SOURCE_DIR}/webapp/fonts.css
+	"Raleway:ital,wght@0,100..900|1,100..900")
+
+set(webpack_output
+	${CMAKE_CURRENT_SOURCE_DIR}/docroot/scripts/index.js)
 
 add_custom_command(
-	OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/docroot/scripts/index.js
-	BYPRODUCTS 
+	OUTPUT ${webpack_output}
 	DEPENDS ${webpack_input}
 	COMMAND ${YARN} run $<IF:$<CONFIG:Debug>,build,build-production>
-	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-	VERBATIM)
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_custom_target(webpack DEPENDS ${webpack_output})
+add_custom_target(webpack DEPENDS
+	${PROJECT_SOURCE_DIR}/node_modules
+	${webpack_output})
 
 add_dependencies(libzeep-webapp-starter webpack)
 
 if(MRC_FOUND)
 	mrc_target_resources(libzeep-webapp-starter ${PROJECT_SOURCE_DIR}/docroot/)
 endif()
+
+install(TARGETS libzeep-webapp-starter DESTINATION ${CMAKE_INSTALL_SBINDIR})
+
+set(WEBAPP_EXE "${CMAKE_INSTALL_FULL_SBINDIR}/libzeep-webapp-starter")
+set(WEBAPP_PID "/var/run/libzeep-webapp-starter")
+
+configure_file(libzeep-webapp-starter.service.in ${CMAKE_CURRENT_BINARY_DIR}/libzeep-webapp-starter.service @ONLY)
+
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libzeep-webapp-starter.service" DESTINATION "/etc/systemd/system")

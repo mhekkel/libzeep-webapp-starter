@@ -1,0 +1,16 @@
+[Unit]
+Description=An Energy monitoring web service
+Description.nl=Een web applicatie om energie te monitoren
+After=network.target
+Wants=network-online.target
+
+[Service]
+Restart=on-failure
+Type=forking
+PIDFile=@WEBAPP_PID@
+ExecStart=@WEBAPP_EXE@ start
+ExecReload=@WEBAPP_EXE@ reload
+ExecStop=@WEBAPP_EXE@ stop
+
+[Install]
+WantedBy=multi-user.target

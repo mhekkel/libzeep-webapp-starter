@@ -11,11 +11,11 @@
 	<title>My first libzeep web application - Home page</title>
 </head>
 
-<body class="site">
+<body>
 	<nav z2:replace="~{menu::menu('hello')}"></nav>
 
-	<div class="container site-content">
-		<h1 class="mt-5">This is page <em>Form</em>.</h1>
+	<div class="container">
+		<h2 class="mt-5">This is page <em>hello</em>.</h2>
 
 		<p class="mt-3"><span z2:if="${user}" z2:text="|Hello ${user}! |"></span>This is a page with a simple form.</p>
 

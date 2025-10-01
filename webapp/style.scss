@@ -3,17 +3,25 @@
 @import "bootstrap/scss/bootstrap";
 @import "bootstrap-icons/font/bootstrap-icons.css";
 
+@import "fonts.css";
+
 // Add your own style here
 
-.site {
+body {
 	display: flex;
 	min-height: 100vh;
 	height: 100%;
 	flex-direction: column;
+	font-family: Raleway;
 
 	header,
 	footer {
 		flex: none;
+	}
+
+	header {
+		background-color: #3a0000;
+		color: white;
 	}
 
 	footer {
@@ -25,7 +33,7 @@
 		white-space: pre;
 	}
 
-	.site-content {
+	& > header ~ div.container {
 		flex: 1 0 auto;
 		padding: var(--space) var(--space) 0;
 		width: 100%;
