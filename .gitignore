@@ -6,5 +6,6 @@ docroot/css
 src/revision.hpp
 src/mrsrc.hpp
 .cache/
+.vscode/
 webapp/fonts.css
 webapp/fonts/
