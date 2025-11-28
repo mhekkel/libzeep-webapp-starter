@@ -108,6 +108,7 @@ int main(int argc, const char *argv[])
 		return 0;
 	}
 
+#if HTTP_HAS_UNIX_DAEMON
 	if (config.operands().size() != 1 or config.has("help"))
 	{
 		std::cout << config << std::endl
@@ -123,6 +124,13 @@ Command should be either:
 
 		return config.has("help") ? 0 : 1;
 	}
+#else
+	if (config.has("help"))
+	{
+		std::cout << config << std::endl;
+		return 0;
+	}
+#endif
 
 	config.parse_config_file("config", "libzeep-webapp-starter.conf",
 		{ ".", "/etc" }, ec);
@@ -133,6 +141,8 @@ Command should be either:
 	}
 
 	// --------------------------------------------------------------------
+
+#if HTTP_HAS_UNIX_DAEMON
 
 	zeep::http::daemon server(
 		[]()
@@ -186,6 +196,32 @@ Command should be either:
 		std::cerr << "Invalid command" << std::endl;
 		result = 1;
 	}
+#else
+	zeep::http::server s("docroot");
+
+#if WEBAPP_USES_RESOURCES
+	s.set_template_processor(
+		new zeep::http::rsrc_based_html_template_processor());
+#else
+	s.set_template_processor(
+		new zeep::http::file_based_html_template_processor("docroot"));
+#endif
+
+	s.add_controller(new start_controller());
+
+	std::string address = config.get("address");
+	uint16_t port = config.get<uint16_t>("port");
+
+	if (address.find(':') != std::string::npos)
+		std::cout << "starting server at http://[" << address << "]:" << port
+					<< '/' << std::endl;
+	else
+		std::cout << "starting server at http://" << address << ':' << port << '/'
+					<< std::endl;
+
+    s.bind(address, port);
+    s.run(2);
+#endif
 
 	return result;
 }
