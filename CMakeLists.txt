@@ -44,7 +44,7 @@ include(VersionString)
 write_version_header(${PROJECT_SOURCE_DIR}/src)
 
 # use mrc to create resources
-find_package(Mrc QUIET)
+find_package(mrc QUIET)
 
 if(NOT MRC_FOUND)
 	message(WARNING "Cannot use resources since mrc was not found")
@@ -53,11 +53,11 @@ else()
 endif()
 
 # Libraries
-find_package(zeep 6 REQUIRED)
-find_package(libmcfp REQUIRED)
+find_package(zeep 7 REQUIRED)
+find_package(mcfp REQUIRED)
 
 add_executable(libzeep-webapp-starter ${PROJECT_SOURCE_DIR}/src/main.cpp)
-target_link_libraries(libzeep-webapp-starter libmcfp::libmcfp zeep::zeep)
+target_link_libraries(libzeep-webapp-starter mcfp::mcfp zeep::zeep)
 
 # yarn rules for javascripts
 
