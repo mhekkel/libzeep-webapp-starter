@@ -106,7 +106,7 @@ set(webpack_output
 
 add_custom_command(
     OUTPUT ${webpack_output}
-    DEPENDS ${webpack_input}
+    DEPENDS ${webpack_input} ${PROJECT_SOURCE_DIR}/node_modules
     COMMAND ${YARN} run $<IF:$<CONFIG:Debug>,build,build-production>
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
