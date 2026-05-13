@@ -35,11 +35,9 @@
 #include "revision.hpp"
 
 #include <zeep/http/daemon.hpp>
-#include <zeep/http/html-controller.hpp>
-#include <zeep/http/server.hpp>
-
 #include <zeep/http/error-handler.hpp>
 #include <zeep/http/html-controller.hpp>
+#include <zeep/http/server.hpp>
 
 #include <mcfp/mcfp.hpp>
 
