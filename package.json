@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"description": "A skeleton for a libzeep web application",
 	"main": "index.js",
-	"repository": "https://github.com/mhekkel/libzeep-webapp-starter.git",
+	"repository": "https://forge.hekkelman.net/maarten/zeep-webapp-starter.git",
 	"author": "Maarten L. Hekkelman <maarten@hekkelman.com>",
 	"license": "BSD-2-Clause",
 	"scripts": {

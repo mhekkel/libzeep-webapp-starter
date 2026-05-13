@@ -4,9 +4,9 @@ Libzeep webapp starter
 This is a project containing a very simple web application based on libzeep.
 It is meant to get new projects up and running fast.
 
-To build this you will need to have [libzeep](https://github.com/mhekkel/libzeep) installed as well
-as [libmcfp](https://github.com/mhekkel/libmcfp.git). You will also need _cmake_ but since you have
-libzeep that should not be a problem. [mrc](https://github.com/mhekkel/mrc.git) should also be 
+To build this you will need to have [libzeep](https://forge.hekkelman.net/maarten/zeep) installed as well
+as [libmcfp](https://forge.hekkelman.net/maarten/libmcfp.git). You will also need _cmake_ but since you have
+libzeep that should not be a problem. [mrc](https://forge.hekkelman.net/maarten/mrc.git) should also be 
 installed if your platform supports it. And you need [yarn](https://yarnpkg.com/).
 
 Building
@@ -16,13 +16,10 @@ To build this web application, make sure you've installed all requirements menti
 Then follow these steps:
 
 ```bash
-git clone https://github.com/mhekkel/libzeep-webapp-starter.git
+git clone https://forge.hekkelman.net/maarten/zeep-webapp-starter.git
 cd libzeep-webapp-starter
-yarn
-mkdir build
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=Debug
-cmake --build .
+cmake -B build # optionally build a debug version with -DCMAKE_BUILD_TYPE=Debug
+cmake --build build
 ```
 
 Running
@@ -59,4 +56,4 @@ Extending
 Of course, this is a very simple example showing how to create a web application and
 use a form and process the output of that form. A lot more is possible, e.g. you can
 add security and user authentication and use REST controllers to communicate with remote
-scripts. See other web applications in the [PDB-REDO](https://github.com/PDB-REDO/) repositories.
+scripts. See e.g. the [energyd](http://forge.hekkelman.net/maarten/energyd.git) web application.
