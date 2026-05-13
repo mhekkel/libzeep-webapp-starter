@@ -25,6 +25,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <exception>
 #if __has_include("mrsrc.hpp") and NDEBUG
 # define WEBAPP_USES_RESOURCES 1
 #else
@@ -80,93 +81,137 @@ int main(int argc, const char *argv[])
 {
 	int result = 0;
 
-	auto &config = mcfp::config::instance();
-
-	config.init("libzeep-webapp-starter [options] command",
-		mcfp::make_option("help,h", "Display help message"),
-		mcfp::make_option("verbose,v", "Verbose output"),
-		mcfp::make_option("version", "Show version information"),
-
-		mcfp::make_option<std::string>("address", "localhost",
-			"External address"),
-		mcfp::make_option<uint16_t>("port", 10336, "Port to listen to"),
-		mcfp::make_option("no-daemon,F", "Do not fork into background"),
-		mcfp::make_option<std::string>("user,u", "www-data",
-			"User to run the daemon"));
-
-	std::error_code ec;
-	config.parse(argc, argv, ec);
-	if (ec)
+	try
 	{
-		std::cerr << "Error parsing arguments: " << ec.message() << std::endl;
-		return 1;
-	}
+		auto &config = mcfp::config::instance();
 
-	if (config.has("version"))
-	{
-		write_version_string(std::cout, config.has("verbose"));
-		return 0;
-	}
+		config.init("libzeep-webapp-starter [options] command",
+			mcfp::make_option("help,h", "Display help message"),
+			mcfp::make_option("verbose,v", "Verbose output"),
+			mcfp::make_option("version", "Show version information"),
+
+			mcfp::make_option<std::string>("address", "localhost",
+				"External address"),
+			mcfp::make_option<uint16_t>("port", 10336, "Port to listen to"),
+			mcfp::make_option("no-daemon,F", "Do not fork into background"),
+			mcfp::make_option<std::string>("user,u", "www-data",
+				"User to run the daemon"));
+
+		std::error_code ec;
+		config.parse(argc, argv, ec);
+		if (ec)
+		{
+			std::cerr << "Error parsing arguments: " << ec.message() << std::endl;
+			return 1;
+		}
+
+		if (config.has("version"))
+		{
+			write_version_string(std::cout, config.has("verbose"));
+			return 0;
+		}
 
 #if HTTP_HAS_UNIX_DAEMON
-	if (config.operands().size() != 1 or config.has("help"))
-	{
-		std::cout << config << std::endl
-				  << R"(
+		if (config.operands().size() != 1 or config.has("help"))
+		{
+			std::cout << config << std::endl
+					  << R"(
 Command should be either:
 
     start     start a new server
     stop      start a running server
     status    get the status of a running server
     reload    restart a running server with new options
-				)"
-				  << std::endl;
+)"
+					  << std::endl;
 
-		return config.has("help") ? 0 : 1;
-	}
+			return config.has("help") ? 0 : 1;
+		}
 #else
-	if (config.has("help"))
-	{
-		std::cout << config << std::endl;
-		return 0;
-	}
+		if (config.has("help"))
+		{
+			std::cout << config << std::endl;
+			return 0;
+		}
 #endif
 
-	config.parse_config_file("config", "libzeep-webapp-starter.conf",
-		{ ".", "/etc" }, ec);
-	if (ec)
-	{
-		std::cerr << "Error parsing config file: " << ec.message() << std::endl;
-		return 1;
-	}
+		config.parse_config_file("config", "libzeep-webapp-starter.conf",
+			{ ".", "/etc" }, ec);
+		if (ec)
+		{
+			std::cerr << "Error parsing config file: " << ec.message() << std::endl;
+			return 1;
+		}
 
-	// --------------------------------------------------------------------
+		// --------------------------------------------------------------------
 
 #if HTTP_HAS_UNIX_DAEMON
 
-	zeep::http::daemon server(
-		[]()
+		zeep::http::daemon server(
+			[]()
+			{
+				auto s = new zeep::http::server("docroot");
+
+# if WEBAPP_USES_RESOURCES
+				s->set_template_processor(
+					new zeep::http::rsrc_based_html_template_processor());
+# else
+				s->set_template_processor(
+					new zeep::http::file_based_html_template_processor("docroot"));
+# endif
+
+				s->add_controller(new start_controller());
+
+				return s;
+			},
+			"libzeep-webapp-starter");
+
+		std::string command = config.operands().front();
+
+		if (command == "start")
 		{
-			auto s = new zeep::http::server("docroot");
+			std::string address = config.get("address");
+			uint16_t port = config.get<uint16_t>("port");
 
-#if WEBAPP_USES_RESOURCES
-			s->set_template_processor(
-				new zeep::http::rsrc_based_html_template_processor());
+			if (address.find(':') != std::string::npos)
+				std::cout << "starting server at http://[" << address << "]:" << port
+						  << '/' << std::endl;
+			else
+				std::cout << "starting server at http://" << address << ':' << port << '/'
+						  << std::endl;
+
+			if (config.has("no-daemon"))
+				result = server.run_foreground(address, port);
+			else
+			{
+				std::string user = config.get("user");
+				result = server.start(address, port, 1, 2, user);
+			}
+		}
+		else if (command == "stop")
+			result = server.stop();
+		else if (command == "status")
+			result = server.status();
+		else if (command == "reload")
+			result = server.reload();
+		else
+		{
+			std::cerr << "Invalid command" << std::endl;
+			result = 1;
+		}
 #else
-			s->set_template_processor(
-				new zeep::http::file_based_html_template_processor("docroot"));
-#endif
+		zeep::http::server s("docroot");
 
-			s->add_controller(new start_controller());
+# if WEBAPP_USES_RESOURCES
+		s.set_template_processor(
+			new zeep::http::rsrc_based_html_template_processor());
+# else
+		s.set_template_processor(
+			new zeep::http::file_based_html_template_processor("docroot"));
+# endif
 
-			return s;
-		},
-		"libzeep-webapp-starter");
+		s.add_controller(new start_controller());
 
-	std::string command = config.operands().front();
-
-	if (command == "start")
-	{
 		std::string address = config.get("address");
 		uint16_t port = config.get<uint16_t>("port");
 
@@ -177,51 +222,15 @@ Command should be either:
 			std::cout << "starting server at http://" << address << ':' << port << '/'
 					  << std::endl;
 
-		if (config.has("no-daemon"))
-			result = server.run_foreground(address, port);
-		else
-		{
-			std::string user = config.get("user");
-			result = server.start(address, port, 1, 2, user);
-		}
+		s.bind(address, port);
+		s.run(2);
+#endif
 	}
-	else if (command == "stop")
-		result = server.stop();
-	else if (command == "status")
-		result = server.status();
-	else if (command == "reload")
-		result = server.reload();
-	else
+	catch (const std::exception &ex)
 	{
-		std::cerr << "Invalid command" << std::endl;
+		std::cerr << "Unhandled exception: " << ex.what() << '\n';
 		result = 1;
 	}
-#else
-	zeep::http::server s("docroot");
-
-#if WEBAPP_USES_RESOURCES
-	s.set_template_processor(
-		new zeep::http::rsrc_based_html_template_processor());
-#else
-	s.set_template_processor(
-		new zeep::http::file_based_html_template_processor("docroot"));
-#endif
-
-	s.add_controller(new start_controller());
-
-	std::string address = config.get("address");
-	uint16_t port = config.get<uint16_t>("port");
-
-	if (address.find(':') != std::string::npos)
-		std::cout << "starting server at http://[" << address << "]:" << port
-					<< '/' << std::endl;
-	else
-		std::cout << "starting server at http://" << address << ':' << port << '/'
-					<< std::endl;
-
-    s.bind(address, port);
-    s.run(2);
-#endif
 
 	return result;
 }

@@ -25,7 +25,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 # set the project name
-project(libzeep-webapp-starter VERSION 1.0.2 LANGUAGES CXX)
+project(libzeep-webapp-starter VERSION 1.0.3 LANGUAGES CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -38,7 +38,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers")
 elseif(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
 endif()
@@ -51,26 +51,26 @@ write_version_header(${PROJECT_SOURCE_DIR}/src)
 find_package(mrc QUIET)
 
 if(NOT MRC_FOUND)
-	message(WARNING "zeep-webapp-starter: Cannot use resources since mrc was not found")
+    message(WARNING "zeep-webapp-starter: Cannot use resources since mrc was not found")
 else()
-	mrc_write_header(${PROJECT_SOURCE_DIR}/src/mrsrc.hpp)
+    mrc_write_header(${PROJECT_SOURCE_DIR}/src/mrsrc.hpp)
 endif()
 
 # Libraries
 
 CPMFindPackage(NAME zeep
-	GIT_REPOSITORY "https://forge.hekkelman.net/maarten/zeep.git"
-	GIT_TAG v7.1.0
-	EXCLUDE_FROM_ALL YES)
+    GIT_REPOSITORY "https://forge.hekkelman.net/maarten/zeep.git"
+    GIT_TAG v7.1.0
+    EXCLUDE_FROM_ALL YES)
 
 CPMFindPackage(
-	NAME mcfp
-	GIT_REPOSITORY https://forge.hekkelman.net/maarten/mcfp.git
-	GIT_TAG v1.4.2
-	VERSION 1.4.2
-	EXCLUDE_FROM_ALL YES
-	OPTIONS
-	"BUILD_TESTING NO")
+    NAME mcfp
+    GIT_REPOSITORY https://forge.hekkelman.net/maarten/mcfp.git
+    GIT_TAG v1.4.2
+    VERSION 1.4.2
+    EXCLUDE_FROM_ALL YES
+    OPTIONS
+    "BUILD_TESTING NO")
 
 add_executable(libzeep-webapp-starter ${PROJECT_SOURCE_DIR}/src/main.cpp)
 target_link_libraries(libzeep-webapp-starter mcfp::mcfp zeep::zeep)
@@ -81,38 +81,43 @@ find_program(YARN yarn REQUIRED)
 
 # Make sure yarn is initialised
 add_custom_command(
-	OUTPUT ${PROJECT_SOURCE_DIR}/node_modules
-	COMMAND ${YARN}
-	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+    OUTPUT ${PROJECT_SOURCE_DIR}/node_modules
+    COMMAND ${YARN}
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+
+set_property(
+    TARGET libzeep-webapp-starter
+    APPEND
+    PROPERTY ADDITIONAL_CLEAN_FILES ${PROJECT_SOURCE_DIR}/node_modules)
 
 download_google_webfont(
-	CSS_FILE ${CMAKE_CURRENT_SOURCE_DIR}/webapp/fonts.css
-	FONTS "Raleway:ital,wght@0,100..900|1,100..900")
+    CSS_FILE ${CMAKE_CURRENT_SOURCE_DIR}/webapp/fonts.css
+    FONTS "Raleway:ital,wght@0,100..900|1,100..900")
 
 list(APPEND webpack_input
-	${CMAKE_CURRENT_SOURCE_DIR}/webapp/index.js
-	${CMAKE_CURRENT_SOURCE_DIR}/webapp/fonts.css
-	${CMAKE_CURRENT_SOURCE_DIR}/webapp/style.scss
-	${CMAKE_CURRENT_SOURCE_DIR}/webpack.config.js
+    ${CMAKE_CURRENT_SOURCE_DIR}/webapp/index.js
+    ${CMAKE_CURRENT_SOURCE_DIR}/webapp/fonts.css
+    ${CMAKE_CURRENT_SOURCE_DIR}/webapp/style.scss
+    ${CMAKE_CURRENT_SOURCE_DIR}/webpack.config.js
 )
 
 set(webpack_output
-	${CMAKE_CURRENT_SOURCE_DIR}/docroot/scripts/index.js)
+    ${CMAKE_CURRENT_SOURCE_DIR}/docroot/scripts/index.js)
 
 add_custom_command(
-	OUTPUT ${webpack_output}
-	DEPENDS ${webpack_input}
-	COMMAND ${YARN} run $<IF:$<CONFIG:Debug>,build,build-production>
-	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+    OUTPUT ${webpack_output}
+    DEPENDS ${webpack_input}
+    COMMAND ${YARN} run $<IF:$<CONFIG:Debug>,build,build-production>
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_custom_target(webpack DEPENDS
-	${PROJECT_SOURCE_DIR}/node_modules
-	${webpack_output})
+    ${PROJECT_SOURCE_DIR}/node_modules
+    ${webpack_output})
 
 add_dependencies(libzeep-webapp-starter webpack)
 
 if(MRC_FOUND)
-	mrc_target_resources(libzeep-webapp-starter ${PROJECT_SOURCE_DIR}/docroot/)
+    mrc_target_resources(libzeep-webapp-starter ${PROJECT_SOURCE_DIR}/docroot/)
 endif()
 
 install(TARGETS libzeep-webapp-starter DESTINATION ${CMAKE_INSTALL_SBINDIR})
